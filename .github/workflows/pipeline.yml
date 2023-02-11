@@ -12,7 +12,7 @@ env:
   FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
 jobs:
-  test_job:
+  testing:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -33,8 +33,8 @@ jobs:
           command: npm run test:e2e
           start: npm run start:test
           wait-on: http://localhost:5000
-  deploy_job:
-    needs: test_job
+  deploying:
+    needs: testing
     runs-on: ubuntu-20.04
     if: ${{ github.event_name == 'push' }}
     steps:
@@ -43,3 +43,17 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
       - name: deploy app
         run: flyctl deploy --remote-only
+  tag_release:
+    needs: deploying
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'push' }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.55.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
+          WITH_V: true
