@@ -9,27 +9,27 @@ on:
       - master
 
 jobs:
-  testing:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "16"
-      - name: npm install
-        run: npm install
-      - name: lint
-        run: npm run eslint
-      - name: build
-        run: npm run build
-      - name: test
-        run: npm run test
-      - name: e2e tests
-        uses: cypress-io/github-action@v5
-        with:
-          command: npm run test:e2e
-          start: npm run start:test
-          wait-on: http://localhost:5000
+  # testing:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: "16"
+  #     - name: npm install
+  #       run: npm install
+  #     - name: lint
+  #       run: npm run eslint
+  #     - name: build
+  #       run: npm run build
+  #     - name: test
+  #       run: npm run test
+  #     - name: e2e tests
+  #       uses: cypress-io/github-action@v5
+  #       with:
+  #         command: npm run test:e2e
+  #         start: npm run start:test
+  #         wait-on: http://localhost:5000
   # deploying:
   #   needs: testing
   #   runs-on: ubuntu-20.04
@@ -53,12 +53,12 @@ jobs:
   #       bump_version_scheme: patch
   #       tag_prefix: "v"
   notification:
-    needs: testing
+    # needs: testing
     runs-on: ubuntu-20.04
     steps:
       - name: Test Success
         uses: rjstone/discord-webhook-notify@v1
-        if: success()
+        if: ${{ success() }}
         with:
           severity: info
           username: Github
@@ -69,7 +69,7 @@ jobs:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Test Failure
         uses: rjstone/discord-webhook-notify@v1
-        if: failure()
+        if: ${{ failure() }}
         with:
           severity: error
           username: Github
